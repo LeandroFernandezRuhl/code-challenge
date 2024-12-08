@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './users/user.module';
 import { CoursesModule } from './courses/courses.module';
 import { HttpModule } from '@nestjs/axios';
+import { FirebaseAdmin } from 'config/firebase.setup';
 
 @Module({
   imports: [
@@ -33,6 +34,6 @@ import { HttpModule } from '@nestjs/axios';
     CoursesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, FirebaseAdmin],
 })
 export class AppModule {}

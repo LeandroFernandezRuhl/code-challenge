@@ -1,24 +1,51 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { Test } from '@nestjs/testing';
+import { CoursesModule } from '../src/courses/courses.module';
+import { CoursesService } from '../src/courses/courses.service';
+import { Course } from '../src/courses/entities/course.entity';
+import { Prerequisite } from '../src/courses/entities/prerequisite.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthGuard } from '../src/guards/auth.guard';
 
-describe('AppController (e2e)', () => {
+describe('Courses', () => {
   let app: INestApplication;
+  const coursesService = { generateStudySchedule: () => ['test'] };
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+  beforeAll(async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          entities: [Course, Prerequisite],
+          synchronize: true,
+        }),
+        CoursesModule,
+      ],
+    })
+      .overrideProvider(CoursesService)
+      .useValue(coursesService)
+      .overrideGuard(AuthGuard)
+      .useValue({
+        canActivate: () => true,
+      })
+      .compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleRef.createNestApplication();
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it(`/POST schedule`, () => {
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .post('/courses/schedule')
+      .expect(201)
+      .expect({
+        schedule: coursesService.generateStudySchedule(),
+      });
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });

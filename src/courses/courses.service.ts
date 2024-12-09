@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Course } from './entities/course.entity';
@@ -8,6 +8,8 @@ import { topologicalSort } from '../util/topological-sort.util';
 
 @Injectable()
 export class CoursesService {
+  private readonly logger = new Logger(CoursesService.name);
+
   constructor(
     @InjectRepository(Course)
     private courseRepo: Repository<Course>,
@@ -16,29 +18,39 @@ export class CoursesService {
   ) {}
 
   async generateStudySchedule(inputs: CourseInput[]): Promise<string[]> {
+    this.logger.log('Generating study schedule');
     const courseMap = new Map<string, Course>();
 
-    for (const { desiredCourse, requiredCourse } of inputs) {
-      let required = courseMap.get(requiredCourse);
-      if (!required) {
-        required = await this.createOrUpdateCourse(requiredCourse);
-        courseMap.set(requiredCourse, required);
+    try {
+      for (const { desiredCourse, requiredCourse } of inputs) {
+        let required = courseMap.get(requiredCourse);
+        if (!required) {
+          required = await this.createOrUpdateCourse(requiredCourse);
+          courseMap.set(requiredCourse, required);
+        }
+
+        let desired = courseMap.get(desiredCourse);
+        if (!desired) {
+          desired = await this.createOrUpdateCourse(desiredCourse);
+          courseMap.set(desiredCourse, desired);
+        }
+
+        await this.createOrUpdatePrerequisite(required.id, desired.id);
       }
-      let desired = courseMap.get(desiredCourse);
-      if (!desired) {
-        desired = await this.createOrUpdateCourse(desiredCourse);
-        courseMap.set(desiredCourse, desired);
-      }
-      await this.createOrUpdatePrerequisite(required.id, desired.id);
+
+      const graph = this.generateCoursesGraph(
+        await this.courseRepo.find(),
+        await this.prereqRepo.find(),
+      );
+
+      const sorted = topologicalSort(graph);
+
+      this.logger.log('Successfully generated study schedule');
+      return sorted;
+    } catch (error) {
+      this.logger.error('Error generating study schedule', error.stack);
+      throw error;
     }
-
-    const graph = this.generateCoursesGraph(
-      await this.courseRepo.find(),
-      await this.prereqRepo.find(),
-    );
-    const sorted = topologicalSort(graph);
-
-    return sorted;
   }
 
   private async createOrUpdateCourse(name: string): Promise<Course> {

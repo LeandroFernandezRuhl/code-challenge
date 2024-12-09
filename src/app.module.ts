@@ -7,6 +7,8 @@ import { UserModule } from './users/user.module';
 import { CoursesModule } from './courses/courses.module';
 import { HttpModule } from '@nestjs/axios';
 import { FirebaseAdmin } from 'config/firebase.setup';
+import { Prerequisite } from './courses/entities/prerequisite.entity';
+import { Course } from './courses/entities/course.entity';
 
 @Module({
   imports: [
@@ -23,7 +25,7 @@ import { FirebaseAdmin } from 'config/firebase.setup';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [],
+        entities: [Course, Prerequisite],
         synchronize: true,
         autoLoadEntities: true,
       }),

@@ -1,0 +1,133 @@
+{
+	"info": {
+		"_postman_id": "c48983ef-3c42-48c5-b206-61e6e3600208",
+		"name": "bankuishChallenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26662519"
+	},
+	"item": [
+		{
+			"name": "signUp",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\n    \"email\": \"leandro@test.com\",\n    \"password\": \"Some password\",\n    \"firstName\": \"Leandro\",\n    \"lastName\": \"Fernandez\",\n    \"role\": \"USER\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/user/signup",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signIn",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{\n    \"email\": \"leandro@test.com\",\n    \"password\": \"Some password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/user/signin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user",
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createSchedule",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "{{authorization}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"courses\": [\n        {\n            \"desiredCourse\": \"PortfolioConstruction\",\n            \"requiredCourse\": \"PortfolioTheories\"\n        },\n        {\n            \"desiredCourse\": \"InvestmentManagement\",\n            \"requiredCourse\": \"Investment\"\n        },\n        {\n            \"desiredCourse\": \"Investment\",\n            \"requiredCourse\": \"Finance\"\n        },\n        {\n            \"desiredCourse\": \"PortfolioTheories\",\n            \"requiredCourse\": \"Investment\"\n        },\n        {\n            \"desiredCourse\": \"InvestmentStyle\",\n            \"requiredCourse\": \"InvestmentManagement\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/courses/schedule",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"courses",
+						"schedule"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "authorization",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

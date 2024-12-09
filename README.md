@@ -60,6 +60,8 @@ $ sudo docker-compose up --build
 ```
 
 ## API Endpoints
+You can try out all the endpoints using the **Postman Collection** at the root of the project.
+
 **POST /user/signup**
 
 **Description:** Registers a new user using Firebase Authentication.
